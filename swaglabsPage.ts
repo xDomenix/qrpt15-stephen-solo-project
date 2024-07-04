@@ -10,15 +10,19 @@ export class SwagLabs extends BasePage {
     inventoryItemByName = (itemName: string): By => By.xpath(`//div[text()="${itemName}"]/ancestor::div[@class="inventory_item"]//button`);
     cartButton: By = By.xpath('//*[@class="shopping_cart_link"]');
     cartQuantityInputByName = (itemName: string): By => By.xpath(`//div[text()="${itemName}"]/ancestor::div[@class="cart_item"]//input[@class="cart_quantity"]`);
+    cartItemByName = (itemName: string): By => By.xpath(`//div[text()="${itemName}"]/ancestor::div[@class="cart_item"]`);
+    removeButtonByName = (itemName: string): By => By.xpath(`//div[text()="${itemName}"]/ancestor::div[@class="cart_item"]//button`);
     checkoutButton: By = By.xpath('//*[@id="checkout"]');
     continueButton: By = By.xpath('//*[@id="continue"]');
     finishButton: By = By.xpath('//*[@id="finish"]');
     firstNameInput: By = By.xpath('//*[@id="first-name"]');
     lastNameInput: By = By.xpath('//*[@id="last-name"]');
     zipCodeInput: By = By.xpath('//*[@id="postal-code"]');
+    confirmationMessage: By = By.xpath('//h2[@class="complete-header"]');
     productsButton: By = By.xpath('//*[@id="inventory_sidebar_link"]');
     backToHomeButton: By = By.xpath('//*[@id="back-to-products"]');
     menuBtn: By = By.id('react-burger-menu-btn'); 
+
     constructor(){
         super({url: "https://www.saucedemo.com/"}); 
     }; 
@@ -39,6 +43,11 @@ export class SwagLabs extends BasePage {
         await this.driver.findElement(addItemXPath).click();
     }
 
+    async removeItemFromCart(itemName: string): Promise<void> {
+        const removeItemXPath = this.removeButtonByName(itemName);
+        await this.driver.findElement(removeItemXPath).click();
+    }
+
     async navigateToCart(): Promise<void> {
         await this.driver.findElement(this.cartButton).click();
     }
@@ -50,28 +59,33 @@ export class SwagLabs extends BasePage {
         await element.sendKeys(quantity);
     }
 
+    async getCartItems(): Promise<string[]> {
+        const cartItemElements = await this.driver.findElements(By.css('.inventory_item_name'));
+        const cartItems = [];
+        for (const element of cartItemElements) {
+            cartItems.push(await element.getText());
+        }
+        return cartItems;
+    }
+
     async checkout(): Promise<void> {
         await this.driver.findElement(this.checkoutButton).click();
     }
 
-    async fillFirstName(firstName: string): Promise<void> {
+    async fillShippingInfo(firstName: string, lastName: string, zipCode: string): Promise<void> {
         await this.setInput(this.firstNameInput, firstName);
-    }
-
-    async fillLastName(lastName: string): Promise<void> {
         await this.setInput(this.lastNameInput, lastName);
-    }
-
-    async fillZipCode(zipCode: string): Promise<void> {
         await this.setInput(this.zipCodeInput, zipCode);
-    }
-
-    async clickContinue(): Promise<void> {
         await this.click(this.continueButton);
     }
 
     async finishCheckout(): Promise<void> {
         await this.click(this.finishButton);
+    }
+
+    async getConfirmationMessage(): Promise<string> {
+        const confirmationElement = await this.driver.findElement(this.confirmationMessage);
+        return await confirmationElement.getText();
     }
 
     async navigateToProducts(): Promise<void> {

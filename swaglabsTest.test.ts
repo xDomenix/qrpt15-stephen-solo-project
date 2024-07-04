@@ -20,6 +20,26 @@ describe('Swag Labs Tests', () => {
         expect(url).toBe("https://www.saucedemo.com/cart.html");
     });
 
+    test('should remove item from cart', async () => {
+        const itemName = "Sauce Labs Backpack";
+        await swagLabs.addItemToCart(itemName);
+        await swagLabs.navigateToCart();
+        await swagLabs.removeItemFromCart(itemName);
+        const cartItems = await swagLabs.getCartItems();
+        expect(cartItems).not.toContain(itemName);
+    });
+
+    test('should complete checkout process', async () => {
+        const itemName = "Sauce Labs Backpack";
+        await swagLabs.addItemToCart(itemName);
+        await swagLabs.navigateToCart();
+        await swagLabs.checkout();
+        await swagLabs.fillShippingInfo('John', 'Doe', '12345');
+        await swagLabs.finishCheckout();
+        const confirmationMessage = await swagLabs.getConfirmationMessage();
+        expect(confirmationMessage).toContain('Thank you for your order');
+    });
+
     test('should logout successfully', async () => {
         await swagLabs.logout();
         const url = await swagLabs.driver.getCurrentUrl();
