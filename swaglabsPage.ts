@@ -18,7 +18,7 @@ export class SwagLabs extends BasePage {
     zipCodeInput: By = By.xpath('//*[@id="postal-code"]');
     productsButton: By = By.xpath('//*[@id="inventory_sidebar_link"]');
     backToHomeButton: By = By.xpath('//*[@id="back-to-products"]');
-
+    menuBtn: By = By.id('react-burger-menu-btn'); 
     constructor(){
         super({url: "https://www.saucedemo.com/"}); 
     }; 
@@ -30,6 +30,7 @@ export class SwagLabs extends BasePage {
     }
 
     async logout(): Promise<void> {
+        await this.click(this.menuBtn); 
         await this.click(this.logoutButton);
     }
 
