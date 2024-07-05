@@ -22,7 +22,9 @@ export class SwagLabs extends BasePage {
     productsButton: By = By.xpath('//*[@id="inventory_sidebar_link"]');
     backToHomeButton: By = By.xpath('//*[@id="back-to-products"]');
     menuBtn: By = By.id('react-burger-menu-btn'); 
-
+    backPack: By = By.xpath('//div[text()="Sauce Labs Backpack"]');
+    removeBtn: By = By.xpath('//button[text()="Remove"]');  
+    addToCart: By = By.xpath('(//button[@class="btn btn_primary btn_small btn_inventory"])[1]'); 
     constructor(){
         super({url: "https://www.saucedemo.com/"}); 
     }; 
@@ -38,14 +40,15 @@ export class SwagLabs extends BasePage {
         await this.click(this.logoutButton);
     }
 
-    async addItemToCart(itemName: string): Promise<void> {
-        const addItemXPath = this.inventoryItemByName(itemName);
-        await this.driver.findElement(addItemXPath).click();
+    async addItemToCart(): Promise<void> {
+        await this.click(this.backPack)
+        await this.driver.sleep(2000)
+        await this.click(this.addToCart)
+    
     }
 
-    async removeItemFromCart(itemName: string): Promise<void> {
-        const removeItemXPath = this.removeButtonByName(itemName);
-        await this.driver.findElement(removeItemXPath).click();
+    async removeItemFromCart(): Promise<void>{
+       return(await this.click(this.removeBtn))
     }
 
     async navigateToCart(): Promise<void> {
@@ -59,14 +62,14 @@ export class SwagLabs extends BasePage {
         await element.sendKeys(quantity);
     }
 
-    async getCartItems(): Promise<string[]> {
+   /* async getCartItems(): Promise<string[]> {
         const cartItemElements = await this.driver.findElements(By.css('.inventory_item_name'));
         const cartItems = [];
         for (const element of cartItemElements) {
             cartItems.push(await element.getText());
         }
         return cartItems;
-    }
+    }*/
 
     async checkout(): Promise<void> {
         await this.driver.findElement(this.checkoutButton).click();
